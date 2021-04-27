@@ -9,6 +9,9 @@ h1 {
   z-index: 10;
   margin: 0;
   padding: 0;
+  background:rgba(245,245,245, 0.8);
+  border-radius: 15px;
+  padding-left: 3px;
 }
 
 .search {
@@ -17,6 +20,26 @@ h1 {
   left: 50%;
   transform: translate(-50%);
   width: 100%;
-  max-width: 400px;
+  max-width: 300px;
   z-index: 10;
+}
+
+.search input {
+  padding: 0.5rem;
+  font-size: 1.5rem;
+  width: 100%;
+}
+
+.locate {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  z-index: 10;
+}
+
+.locate img {
+  width: 30px;
+  cursor: pointer;
 }
