@@ -1,6 +1,8 @@
 import React from "react";
 import "./App.css";
+import DummyData from "./DummyData"
 import MapStyles from "./mapStyles";
+import SideBar from './SideBar/SideBar'
 import {
   GoogleMap,
   useLoadScript,
@@ -22,12 +24,31 @@ import {
 } from "@reach/combobox";
 import "@reach/combobox/styles.css";
 
+
+
 export default function App() {
   const libraries = ["places"];
   const mapContainerStyle = {
-    width: "100vw",
+    width: "80vw",
     height: "100vh",
   };
+
+  // function getCenter() {
+  //   //const center = {};
+  //   navigator.geolocation.getCurrentPosition(
+  //     (position) => {
+  //       panTo({
+  //         lat: position.coords.latitude,
+  //         lng: position.coords.longitude,
+  //       }); /// this is the successful call
+  //     },
+  //     //() => null ///this is the error
+  //     () => alert("There was an error getting your location")
+  //   );
+  //   //return (center = {lat,lng,});
+  // }
+  // const center = getCenter();
+  
   const center = {
     lat: 39.7392,
     lng: -104.9903,
@@ -42,8 +63,11 @@ export default function App() {
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries,
   });
-  const [markers, setMarkers] = React.useState([]);
+  // const [markers, setMarkers] = React.useState([]);
+  const [markers, setMarkers] = React.useState(DummyData);
   const [selected, setSelected] = React.useState(null);
+
+  console.log("these are the markers", markers)
 
   const onMapClick = React.useCallback((e) => {
     setMarkers((current) => [
@@ -73,11 +97,11 @@ export default function App() {
     <div className="App">
       <h1>
         Wanderer{" "}
-        <span role="img" aria-label="globe">
+        <span role="img" aria-label="current location">
           📍
         </span>
       </h1>
-
+      <SideBar markers={markers} InfoWindow={<InfoWindow/>}/>
       <Search panTo={panTo} />
       <Locate panTo={panTo} />
 
@@ -89,7 +113,7 @@ export default function App() {
         onClick={onMapClick}
         onLoad={onMapLoad}
       >
-        {markers.map((marker) => (
+        {/* {markers.map((marker) => (
           <Marker
             key={marker.time.toISOString()}
             position={{ lat: marker.lat, lng: marker.lng }}
@@ -103,7 +127,23 @@ export default function App() {
               setSelected(marker);
             }}
           />
+        ))} */}
+        {DummyData.map((marker) => (
+          <Marker
+            key={marker.time}
+            position={{ lat: marker.lat, lng: marker.lng }}
+            // icon={{
+            //   url: '/logo.png',
+            //   scaledSize: new window.google.maps.Size(30, 30),
+            //   origin: new window.google.maps.Point(0,0),
+            //   anchor: new window.google.maps.Point(15, 15),
+            // }}
+            onClick={() => {
+              setSelected(marker);
+            }}
+          />
         ))}
+
 
         {selected ? (
           <InfoWindow
@@ -114,7 +154,8 @@ export default function App() {
           >
             <div>
               <h2>I'm here</h2>
-              <p>I was here at: {formatRelative(selected.time, new Date())}</p>
+              {/* <p>I was here at: {formatRelative(selected.time, new Date())}</p> */}
+              <p>I was here at: {(selected.time)}</p>
             </div>
           </InfoWindow>
         ) : null}

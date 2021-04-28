@@ -1,0 +1,22 @@
+.sidebar {
+    display: flex;
+    align-items: center;
+    height: 100vh;
+    background-color: #afbda2
+}
+
+ul {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    border: 2px;
+    border-radius: 10px;
+    border-style: solid;
+    margin: 10px;
+}
