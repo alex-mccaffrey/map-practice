@@ -1,8 +1,8 @@
 import React from "react";
 import "./App.css";
-import DummyData from "./DummyData"
+import DummyData from "./DummyData";
 import MapStyles from "./mapStyles";
-import SideBar from './SideBar/SideBar'
+import SideBar from "./SideBar/SideBar";
 import {
   GoogleMap,
   useLoadScript,
@@ -23,8 +23,6 @@ import {
   ComboboxPopover,
 } from "@reach/combobox";
 import "@reach/combobox/styles.css";
-
-
 
 export default function App() {
   const libraries = ["places"];
@@ -48,7 +46,7 @@ export default function App() {
   //   //return (center = {lat,lng,});
   // }
   // const center = getCenter();
-  
+
   const center = {
     lat: 39.7392,
     lng: -104.9903,
@@ -66,18 +64,26 @@ export default function App() {
   // const [markers, setMarkers] = React.useState([]);
   const [markers, setMarkers] = React.useState(DummyData);
   const [selected, setSelected] = React.useState(null);
+  const [tempMarker, setTempMarker] = React.useState({});
 
-  console.log("these are the markers", markers)
+  console.log("these are the markers", markers);
 
+  // const onMapClick = React.useCallback((e) => {
+  //   setMarkers((current) => [
+  //     ...current,
+  //     {
+  //       lat: e.latLng.lat(),
+  //       lng: e.latLng.lng(),
+  //       time: new Date(),
+  //     },
+  //   ]);
+  // }, []);
   const onMapClick = React.useCallback((e) => {
-    setMarkers((current) => [
-      ...current,
-      {
-        lat: e.latLng.lat(),
-        lng: e.latLng.lng(),
-        time: new Date(),
-      },
-    ]);
+    setTempMarker({
+      lat: e.latLng.lat(),
+      lng: e.latLng.lng(),
+      time: new Date(),
+    });
   }, []);
 
   const mapRef = React.useRef();
@@ -93,18 +99,30 @@ export default function App() {
   if (loadError) return "Error loading maps";
   if (!isLoaded) return "Loading Maps";
 
+  /////Here is the temp marker, aka a single marker on each click, not multiple
+  const renderTempMarker = () => {
+    if (Object.keys(tempMarker).length > 0) {
+      console.log("this is the temp marker running", tempMarker)
+      return (
+        <Marker
+          key={tempMarker.time}
+          position={{ lat: parseFloat(tempMarker.lat), lng: parseFloat(tempMarker.lng) }}
+          onClick={() => {
+            setSelected(tempMarker);
+          }}
+          
+        />
+      );
+    }
+  };
+
+
   return (
     <div className="App">
-      <h1>
-        Wanderer{" "}
-        <span role="img" aria-label="current location">
-          📍
-        </span>
-      </h1>
-      <SideBar markers={markers} InfoWindow={<InfoWindow/>}/>
-      <Search panTo={panTo} />
-      <Locate panTo={panTo} />
-
+      
+      {/* <Search panTo={panTo} />   took out search bar, if added back in this needs to be uncommented*/} 
+      <Locate panTo={panTo} setTempMarker={setTempMarker} />
+      <SideBar markers={markers} InfoWindow={InfoWindow} setTempMarker={setTempMarker} panTo={panTo}/>
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         zoom={10}
@@ -128,22 +146,19 @@ export default function App() {
             }}
           />
         ))} */}
+
         {DummyData.map((marker) => (
+          
           <Marker
             key={marker.time}
             position={{ lat: marker.lat, lng: marker.lng }}
-            // icon={{
-            //   url: '/logo.png',
-            //   scaledSize: new window.google.maps.Size(30, 30),
-            //   origin: new window.google.maps.Point(0,0),
-            //   anchor: new window.google.maps.Point(15, 15),
-            // }}
             onClick={() => {
               setSelected(marker);
             }}
           />
         ))}
 
+        {renderTempMarker()}
 
         {selected ? (
           <InfoWindow
@@ -154,31 +169,37 @@ export default function App() {
           >
             <div>
               <h2>I'm here</h2>
-              {/* <p>I was here at: {formatRelative(selected.time, new Date())}</p> */}
-              <p>I was here at: {(selected.time)}</p>
+              <p>I was here at: {formatRelative(selected.time, new Date())}</p>
+              {/* <p>I was here at: {selected.time}</p> */}
             </div>
           </InfoWindow>
         ) : null}
       </GoogleMap>
+      
     </div>
   );
 }
 
 ///////// Current Location Feature //////////
 
-function Locate({ panTo }) {
+function Locate({ panTo, setTempMarker }) {
   return (
     <button
       className="locate"
       onClick={() => {
         navigator.geolocation.getCurrentPosition(
           (position) => {
+            setTempMarker({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+              time: new Date(),
+            })
             panTo({
               lat: position.coords.latitude,
               lng: position.coords.longitude,
-            }); /// this is the successfull call
+            });
           },
-          () => null ///this is the error
+          () => alert("There was an error getting your location. Please check the location settings in your browser.")
         );
       }}
     >
@@ -188,53 +209,53 @@ function Locate({ panTo }) {
 }
 
 //////////// Search Bar /////////////////
-function Search({ panTo }) {
-  const {
-    ready,
-    value,
-    suggestions: { status, data },
-    setValue,
-    clearSuggestions,
-  } = usePlacesAutocomplete({
-    requestOptions: {
-      location: { lat: () => 39.7392, lng: () => -104.9903 },
-      radius: 2000,
-    },
-  });
+// function Search({ panTo }) {
+//   const {
+//     ready,
+//     value,
+//     suggestions: { status, data },
+//     setValue,
+//     clearSuggestions,
+//   } = usePlacesAutocomplete({
+//     requestOptions: {
+//       location: { lat: () => 39.7392, lng: () => -104.9903 },
+//       radius: 2000,
+//     },
+//   });
 
-  return (
-    <div className="search">
-      <Combobox
-        onSelect={async (address) => {
-          setValue(address, false);
-          clearSuggestions();
+//   return (
+//     <div className="search">
+//       <Combobox
+//         onSelect={async (address) => {
+//           setValue(address, false);
+//           clearSuggestions();
 
-          try {
-            const results = await getGeocode({ address });
-            const { lat, lng } = await getLatLng(results[0]);
-            panTo({ lat, lng });
-          } catch (error) {
-            console.log("error!");
-          }
-        }}
-      >
-        <ComboboxInput
-          value={value}
-          onChange={(e) => {
-            setValue(e.target.value);
-          }}
-          disabled={!ready}
-          placeholder="Enter and Address"
-        />
-        <ComboboxPopover>
-          <ComboboxList>
-            {status === "OK" &&
-              data.map(({ id, description }) => (
-                <ComboboxOption key={id} value={description} />
-              ))}
-          </ComboboxList>
-        </ComboboxPopover>
-      </Combobox>
-    </div>
-  );
-}
+//           try {
+//             const results = await getGeocode({ address });
+//             const { lat, lng } = await getLatLng(results[0]);
+//             panTo({ lat, lng });
+//           } catch (error) {
+//             console.log("error!");
+//           }
+//         }}
+//       >
+//         <ComboboxInput
+//           value={value}
+//           onChange={(e) => {
+//             setValue(e.target.value);
+//           }}
+//           disabled={!ready}
+//           placeholder="Enter and Address"
+//         />
+//         <ComboboxPopover>
+//           <ComboboxList>
+//             {status === "OK" &&
+//               data.map(({ id, description }) => (
+//                 <ComboboxOption key={id} value={description} />
+//               ))}
+//           </ComboboxList>
+//         </ComboboxPopover>
+//       </Combobox>
+//     </div>
+//   );
+// }
