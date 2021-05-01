@@ -22,10 +22,11 @@ li {
     border-radius: 10px;
     border-style: solid;
     margin: 10px;
+    cursor: pointer;
 }
 
 .sidebar-markers {
     display: flex;
     flex-direction: column;
-    margin: 10px
+    margin: 10px;
 }

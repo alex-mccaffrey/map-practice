@@ -2,41 +2,42 @@ import React from "react";
 import "./SideBar.css";
 
 function SideBar(props) {
-  //console.log("these are the markers in sidebar", markers);
   console.log("theses are the props", props);
 
   const markers = props.markers;
-  const setTempMarker = props.setTempMarker;
   const panTo = props.panTo;
 
+  const onClickPanTo = (marker) => {
+    return (
+      console.log("this is inside the onclickpanto", marker),
+      panTo(
+        {
+          lat: marker.lat,
+          lng: marker.lng,
+        },
+        console.log("this is inside the panTO", marker)
+      )
+    );
+  };
 
   const sideBarMarkers = () => {
     return (
       <div>
-        <ul>
-          {markers.map((marker) => (
-              console.log("this is setting temp marker on click", marker),
-            <li
-              className="sidebar-markers"
-              key={marker.id}
-              position={{ lat: marker.lat, lng: marker.lng }}
-              onClick={(marker) => {
-                setTempMarker({
-                    lat: parseFloat(marker.lat),
-                    lng: parseFloat(marker.lng),
-                  //time: new Date(),
-                });
-                panTo({
-                  lat: parseFloat(marker.lat),
-                  lng: parseFloat(marker.lng),
-                });
-              }}
-            >
-              This is the marker id; {marker.id}
-            </li>
-          ))}
-          ;
-        </ul>
+        {markers.map(
+          (marker) => (
+            console.log("this is at the start of the map", marker),
+            (
+              <li
+                key={marker.id}
+                className="sidebar-markers"
+                onClick={() => {onClickPanTo(marker)}}
+              >
+                {console.log("this is the marker at the label", marker)}
+                This is the marker id; {marker.id}
+              </li>
+            )
+          )
+        )}
       </div>
     );
   };
@@ -49,13 +50,8 @@ function SideBar(props) {
           📍
         </span>
       </h1>
-      
-      <ul>
-      {sideBarMarkers()}
-        <li>This is marker one with it's stuff.</li>
-        <li>This is marker two with it's stuff.</li>
-        <li>This is marker three with it's stuff.</li>
-      </ul>
+
+      <>{sideBarMarkers()}</>
     </div>
   );
 }

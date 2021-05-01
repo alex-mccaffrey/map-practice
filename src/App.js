@@ -66,7 +66,6 @@ export default function App() {
   const [selected, setSelected] = React.useState(null);
   const [tempMarker, setTempMarker] = React.useState({});
 
-  console.log("these are the markers", markers);
 
   // const onMapClick = React.useCallback((e) => {
   //   setMarkers((current) => [
@@ -92,6 +91,8 @@ export default function App() {
   }, []);
 
   const panTo = React.useCallback(({ lat, lng }) => {
+    console.log("this is inside the panTo")
+    console.log("this is the latlng in panto", lat, lng)
     mapRef.current.panTo({ lat, lng });
     mapRef.current.setZoom(19);
   }, []);
@@ -102,7 +103,6 @@ export default function App() {
   /////Here is the temp marker, aka a single marker on each click, not multiple
   const renderTempMarker = () => {
     if (Object.keys(tempMarker).length > 0) {
-      console.log("this is the temp marker running", tempMarker)
       return (
         <Marker
           key={tempMarker.time}
@@ -122,7 +122,7 @@ export default function App() {
       
       {/* <Search panTo={panTo} />   took out search bar, if added back in this needs to be uncommented*/} 
       <Locate panTo={panTo} setTempMarker={setTempMarker} />
-      <SideBar markers={markers} InfoWindow={InfoWindow} setTempMarker={setTempMarker} panTo={panTo}/>
+      <SideBar markers={markers} panTo={panTo}/>
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         zoom={10}
@@ -169,8 +169,8 @@ export default function App() {
           >
             <div>
               <h2>I'm here</h2>
-              <p>I was here at: {formatRelative(selected.time, new Date())}</p>
-              {/* <p>I was here at: {selected.time}</p> */}
+              {/* <p>I was here at: {formatRelative(selected.time, new Date())}</p> */}
+              <p>I was here at: {selected.time}</p>
             </div>
           </InfoWindow>
         ) : null}
@@ -259,3 +259,7 @@ function Locate({ panTo, setTempMarker }) {
 //     </div>
 //   );
 // }
+
+
+
+
